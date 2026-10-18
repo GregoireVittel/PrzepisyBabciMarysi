@@ -98,9 +98,14 @@ def render_home(groups: dict, output: Path, root: Path, page) -> None:
             f'<input type="search" id="q" placeholder="Znajdź swój ulubiony przepis..." aria-label="Szukaj przepisu" autocomplete="off">'
             f'<button type="submit" id="go">Szukaj</button></form></div>'
             f'<p class="note">{escape(NOTE_TEXT)} {HEART} <span>{escape(SIGNATURE)}</span></p></div></section>')
-    tiles = "".join(f'<a class="tile tile-{color(c, i)}" href="#{anchor(c)}"><span class="tile-name">{escape(c)}</span>'
-                    f'<span class="tile-count">{plural(len(groups[c]))}</span><span class="tile-icon">{icon(c)}</span></a>'
-                    for i, c in enumerate(cats))
+    def tile(c, i):
+        slug = anchor(c)[4:]
+        if (root / "zasoby" / "kafelki" / f"{slug}.jpg").exists():
+            return (f'<a class="tile tile-photo tile-{slug}" href="#{anchor(c)}" aria-label="{escape(c)} – {plural(len(groups[c]))}">'
+                    f'<img src="zasoby/kafelki/{slug}.jpg" alt="" loading="lazy"><span class="tile-badge">{plural(len(groups[c]))}</span></a>')
+        return (f'<a class="tile tile-{color(c, i)}" href="#{anchor(c)}"><span class="tile-name">{escape(c)}</span>'
+                f'<span class="tile-count">{plural(len(groups[c]))}</span><span class="tile-icon">{icon(c)}</span></a>')
+    tiles = "".join(tile(c, i) for i, c in enumerate(cats))
     # Zeszyt: podział kategorii na dwie strony
     weights = [len(groups[c]) + 3 for c in cats]
     half, acc, left = sum(weights) / 2, 0, []
