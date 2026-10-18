@@ -46,3 +46,5 @@ Body sections:
   build script — no heavy frameworks.
 - Adding a new recipe must only require adding a new folder; the site
   rebuilds without manual edits to other files.
+- Po każdej zmianie w `przepisy/` uruchom `build.py` i zatwierdź zaktualizowany
+  folder `docs/` w tym samym commicie.

@@ -138,5 +138,5 @@ def build(output: Path) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Buduje stronę przepisów")
-    parser.add_argument("--output", type=Path, default=ROOT / "_site")
+    parser.add_argument("--output", type=Path, default=ROOT / "docs")
     build(parser.parse_args().output)
