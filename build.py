@@ -33,10 +33,13 @@ def page(title: str, body: str, *, recipe: bool = False) -> str:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Rodzinne przepisy Babci Marysi">
   <title>{text(title)} — Przepisy Babci Marysi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap&amp;subset=latin-ext" rel="stylesheet">
   <link rel="stylesheet" href="{css}">
 </head>
-<body>
-  <header><nav><a href="{home}">Przepisy Babci Marysi</a></nav></header>
+<body class="{'recipe-page' if recipe else 'home-page'}">
+  <header class="site-header"><nav><a href="{home}">Przepisy Babci Marysi</a></nav></header>
   <main>{body}</main>
   <footer>Rodzinne przepisy Babci Marysi</footer>
 </body>
@@ -72,7 +75,7 @@ def original_sections(body: str, path: Path) -> tuple[str, str]:
 def render_recipe(data: dict, body: str, folder: Path, dest: Path) -> None:
     title = str(data["tytul"])
     transcription, notes = original_sections(body, folder / "przepis.md")
-    parts = [f"<article><h1>{text(title)}</h1>"]
+    parts = [f'<article><h1 class="recipe-title">{text(title)}</h1>']
     note_date = data.get("data_notatki")
     if note_date:
         day = date.fromisoformat(str(note_date))
@@ -86,21 +89,22 @@ def render_recipe(data: dict, body: str, folder: Path, dest: Path) -> None:
             raise ValueError(f"Brak zdjęcia: {source}")
         shutil.copyfile(source, dest / filename)
         caption = str(photo.get("opis") or "Oryginalna notatka")
-        parts.append(f'<figure><a href="{text(filename)}"><img src="{text(filename)}" alt="{text(caption)}" loading="lazy"></a><figcaption>{text(caption)}</figcaption></figure>')
-    parts.append('<h2>Składniki</h2><ul class="ingredients">')
+        parts.append(f'<figure class="pinned-photo"><a href="{text(filename)}" aria-label="Otwórz zdjęcie: {text(caption)}"><img src="{text(filename)}" alt="{text(caption)}" loading="lazy"></a><figcaption>{text(caption)}</figcaption></figure>')
+    parts.append('<div class="lined-paper"><section><h2>Składniki</h2><ul class="ingredients">')
     parts.extend(f"<li>{text(item)}</li>" for item in data["skladniki"])
-    parts.append("</ul><h2>Przygotowanie</h2><ol>")
+    parts.append("</ul></section><section><h2>Przygotowanie</h2><ol>")
     parts.extend(f"<li>{text(step)}</li>" for step in data["kroki"])
-    parts.append("</ol><h2>Oryginalny zapis</h2>")
+    parts.append("</ol></section><section><h2>Oryginalny zapis</h2>")
     parts.append(f'<pre class="transcription">{text(transcription)}</pre>')
+    parts.append("</section></div>")
     if notes:
-        parts.append(f"<h2>Uwagi</h2>{markdown.markdown(escape(notes))}")
+        parts.append(f'<aside class="sticky-note"><h2>Uwagi</h2>{markdown.markdown(escape(notes))}</aside>')
     uncertain = data.get("niepewne_fragmenty") or []
     if uncertain:
-        parts.append('<aside><h2>Niepewne fragmenty</h2><ul>')
+        parts.append('<aside class="sticky-note uncertain"><h2>Niepewne fragmenty</h2><ul>')
         parts.extend(f"<li>{text(item)}</li>" for item in uncertain)
         parts.append("</ul></aside>")
-    parts.append('</article><p><a href="../../index.html">← Wszystkie przepisy</a></p>')
+    parts.append('</article><p class="back-link"><a href="../../index.html">← Wszystkie przepisy</a></p>')
     (dest / "index.html").write_text(page(title, "\n".join(parts), recipe=True), encoding="utf-8")
 
 
@@ -111,7 +115,7 @@ def build(output: Path) -> None:
         shutil.rmtree(output)
     output.mkdir(parents=True)
     shutil.copyfile(ROOT / "style.css", output / "style.css")
-    groups: dict[str, list[tuple[str, str]]] = defaultdict(list)
+    groups: dict[str, list[tuple[str, str, str | None, str | None]]] = defaultdict(list)
     for source in sorted(SOURCE.glob("*/przepis.md")):
         data, body = read_recipe(source)
         if data.get("status") != "zweryfikowany":
@@ -123,14 +127,21 @@ def build(output: Path) -> None:
         destination = output / "przepisy" / slug
         destination.mkdir(parents=True)
         render_recipe(data, body, folder, destination)
-        groups[str(data["kategoria"])].append((str(data["tytul"]), slug))
-    parts = ['<h1>Przepisy Babci Marysi</h1><p>Rodzinne przepisy z oryginalnych notatek.</p>']
+        photos = data.get("zdjecia") or []
+        note_date = data.get("data_notatki")
+        formatted_date = f'{date.fromisoformat(str(note_date)):%d.%m.%Y}' if note_date else None
+        groups[str(data["kategoria"])].append((str(data["tytul"]), slug, photos[0]["plik"] if photos else None, formatted_date))
+    parts = ['<div class="home-intro"><h1>Przepisy Babci Marysi</h1><p>Rodzinne przepisy spisane ręką Babci Marysi</p></div>']
     if not groups:
         parts.append("<p>Brak zweryfikowanych przepisów.</p>")
     for category in sorted(groups, key=str.casefold):
-        parts.append(f"<section><h2>{text(category)}</h2><ul class=\"recipe-list\">")
-        for title, slug in sorted(groups[category], key=lambda entry: entry[0].casefold()):
-            parts.append(f'<li><a href="przepisy/{slug}/">{text(title)}</a></li>')
+        parts.append(f'<section class="category"><h2>{text(category)}</h2><ul class="recipe-list">')
+        for title, slug, photo, note_date in sorted(groups[category], key=lambda entry: entry[0].casefold()):
+            image = (f'<img src="przepisy/{slug}/{text(photo)}" alt="Fragment oryginalnej notatki: {text(title)}" loading="lazy">' if photo else '')
+            tags = f'<span class="tag">{text(category)}</span>'
+            if note_date:
+                tags += f'<span class="tag date-tag">{text(note_date)}</span>'
+            parts.append(f'<li class="recipe-card"><a href="przepisy/{slug}/">{image}<span class="card-content"><span class="card-title">{text(title)}</span><span class="tags">{tags}</span></span></a></li>')
         parts.append("</ul></section>")
     (output / "index.html").write_text(page("Strona główna", "\n".join(parts)), encoding="utf-8")
     (output / ".nojekyll").touch()

@@ -48,3 +48,31 @@ Body sections:
   rebuilds without manual edits to other files.
 - Po każdej zmianie w `przepisy/` uruchom `build.py` i zatwierdź zaktualizowany
   folder `docs/` w tym samym commicie.
+
+## Wygląd strony — własny stary rodzinny zeszyt
+
+- Zachowaj oryginalny charakter strony; nie kopiuj projektu Chef_Vittel.
+- Papier: ciepły krem `#f5ecd7`, delikatne ziarno z CSS lub osadzonego SVG
+  (bez zewnętrznych obrazów) i nieco ciemniejsze brzegi. Atrament tytułów
+  `#2c3e7a`, tekst `#3b2f24`, drobne akcenty `#c0584a`.
+- Google Fonts z polskimi znakami: Caveat (tytuł strony, przepisy, nagłówki,
+  oryginalny zapis; awaryjnie cursive) i Lora (tekst; awaryjnie Georgia, serif).
+- Strona główna: tytuł „Przepisy Babci Marysi”, kursywny podtytuł
+  „Rodzinne przepisy spisane ręką Babci Marysi”, grupowanie po kategorii
+  z odręcznymi nagłówkami. Karty jak kartki zeszytu: cień, taśma washi z CSS,
+  lekkie naprzemienne pochylenie (od -1,5° do 1,5°) prostowane po najechaniu,
+  góra zdjęcia (`object-fit: cover; object-position: top`), tytuł Caveat,
+  etykiety kategorii i daty notatki, jeśli istnieje.
+- Strona przepisu: oryginalne zdjęcie w białej ramce z cieniem, lekkim
+  pochyleniem i taśmą w rogach, klikalne do pełnego rozmiaru. Składniki,
+  Przygotowanie i Oryginalny zapis na papierze z jasnoniebieskimi liniami
+  oraz cienkim czerwonym marginesem; zachowaj dokładnie końce linii zapisu.
+  Uwagi na żółtawej samoprzylepnej kartce; data jako drobny kursywny podpis
+  „Notatka z dnia DD.MM.RRRR”.
+- Maksymalna szerokość około 900 px. Na telefonie 375 px jedna kolumna kart
+  i brak poziomego przewijania. Wyłącz pochylenia i animacje dla
+  `prefers-reduced-motion`; zachowaj czytelny kontrast.
+- Cały interfejs po polsku. Nie zmieniaj treści przepisów ani plików w
+  `przepisy/` lub `szablon/` przy zmianach wyglądu. Buduj komplet strony
+  w `docs/` (HTML, CSS i kopie zdjęć), z pustym `docs/.nojekyll` oraz
+  względnymi odnośnikami działającymi pod ścieżką projektu GitHub Pages.
