@@ -18,7 +18,7 @@ QUOTE = "Dobre jedzenie tworzy najpiękniejsze wspomnienia."
 SIGNATURE = "Babcia Marysia"
 
 COLORS = {"ciasta": "pink", "masy i kremy": "green", "pączki i faworki": "yellow",
-          "serniki": "blue", "torty": "peach", "wypieki": "lilac", "przetwory": "green"}
+          "serniki": "blue", "torty": "peach", "wypieki": "lilac", "przetwory": "green", "dania i zupy": "yellow"}
 CYCLE = ["pink", "green", "yellow", "blue", "peach", "lilac"]
 
 S = 'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"'
@@ -29,6 +29,7 @@ ICONS = {
     "serniki": f'<svg viewBox="0 0 64 64" {S}><path d="M8 40L50 22l6 4v14z"/><path d="M8 40v8h48v-8"/><path d="M8 44h48"/><circle cx="44" cy="17" r="4"/><path d="M47 13l3-4"/></svg>',
     "torty": f'<svg viewBox="0 0 64 64" {S}><path d="M10 30h44v20H10z"/><path d="M10 40c5 3 9-3 14 0s9 3 14 0 10-3 16 0"/><path d="M16 30v-6h32v6"/><path d="M24 24v-8M32 24v-8M40 24v-8"/><path d="M24 12c-1 1-1 3 0 3 1 0 1-2 0-3zM32 12c-1 1-1 3 0 3 1 0 1-2 0-3zM40 12c-1 1-1 3 0 3 1 0 1-2 0-3z"/></svg>',
     "przetwory": f'<svg viewBox="0 0 64 64" {S}><path d="M20 14h24v6H20z"/><path d="M22 20c-6 4-8 9-8 16v12c0 4 3 7 7 7h22c4 0 7-3 7-7V36c0-7-2-12-8-16"/><path d="M18 34h28"/><circle cx="27" cy="44" r="4"/><circle cx="38" cy="42" r="4"/><path d="M27 40c0-2 1-3 3-4M38 38c0-2 1-3 3-4"/></svg>',
+    "dania i zupy": f'<svg viewBox="0 0 64 64" {S}><path d="M8 30h48c0 12-10 20-24 20S8 42 8 30z"/><path d="M20 50h24"/><path d="M24 22c-2-3 2-5 0-8M32 22c-2-3 2-5 0-8M40 22c-2-3 2-5 0-8"/></svg>',
     "default": f'<svg viewBox="0 0 64 64" {S}><path d="M12 42c4-16 18-26 34-24-8 4-12 10-12 18 0 4 2 8 6 10-10 4-22 2-28-4z"/><path d="M20 38c4-6 9-10 15-12M26 44c3-5 7-8 12-10"/></svg>',
 }
 HEART = '<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C1 8.4 3.1 5 6.6 5c2.2 0 3.6 1.2 4.4 2.6.8-1.4 2.2-2.6 4.4-2.6 3.5 0 5.6 3.4 4.2 6.7C19.5 16.4 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2"/></svg>'
@@ -107,33 +108,46 @@ def render_home(groups: dict, output: Path, root: Path, page) -> None:
         return (f'<a class="tile tile-{color(c, i)}" href="#{anchor(c)}"><span class="tile-name">{escape(c)}</span>'
                 f'<span class="tile-count">{plural(len(groups[c]))}</span><span class="tile-icon">{icon(c)}</span></a>')
     tiles = "".join(tile(c, i) for i, c in enumerate(cats))
-    # Zeszyt: podział kategorii na dwie strony
-    weights = [len(groups[c]) + 3 for c in cats]
-    half, acc, left = sum(weights) / 2, 0, []
-    for c, w in zip(cats, weights):
-        if acc < half - w / 2 or not left:
-            left.append(c); acc += w
-    right = [c for c in cats if c not in left]
+    # Zeszyt: zakładki – jedna kategoria naraz, wpisy w dwóch kolumnach
+    SUB_ORDER = ["Zupy", "Pierogi, kluski i placki", "Gołąbki", "Mięsa i drób", "Dodatki"]
 
-    def column(categories):
-        out = []
-        for c in categories:
-            i = cats.index(c)
+    def panel(c, i):
+        entries = sorted(groups[c], key=lambda e: e[0].casefold())
+        subs = {}
+        for e in entries:
+            subs.setdefault(e[4], []).append(e)
+        order = sorted(subs, key=lambda k: (k == "", SUB_ORDER.index(k) if k in SUB_ORDER else 99, k))
+        blocks = []
+        for k in order:
             items = "".join(f'<li data-name="{escape(norm(t))}"><span class="num">{n:02d}.</span><a href="przepisy/{s}/">{escape(t)}</a><span class="chev">›</span></li>'
-                            for n, (t, s, _, _) in enumerate(sorted(groups[c], key=lambda e: e[0].casefold()), 1))
-            out.append(f'<section class="nb-cat nb-{color(c, i)}" id="{anchor(c)}"><h3><span class="nb-icon">{icon(c)}</span><span class="nb-title">{escape(c)}</span></h3><ol>{items}</ol></section>')
-        return "".join(out)
+                            for n, (t, s, *_rest) in enumerate(subs[k], 1))
+            head = f'<h4 class="nb-sub">{escape(k)}</h4>' if k else ''
+            blocks.append(f'<div class="nb-group">{head}<ol>{items}</ol></div>')
+        return (f'<section class="nb-cat nb-{color(c, i)}" id="{anchor(c)}" role="tabpanel" aria-label="{escape(c)}">'
+                f'<h3><span class="nb-icon">{icon(c)}</span><span class="nb-title">{escape(c)}</span><span class="nb-count">{plural(len(entries))}</span></h3>'
+                f'<div class="nb-cols">{"".join(blocks)}</div></section>')
 
+    tabs = "".join(f'<button type="button" class="nb-tab nb-{color(c, i)}" role="tab" data-target="{anchor(c)}">{escape(c)}</button>' for i, c in enumerate(cats))
+    panels = "".join(panel(c, i) for i, c in enumerate(cats))
     notebook = (f'<section class="notebook-wrap" id="zeszyt"><h2>Otwórz zeszyt Babci {HEART}</h2><p class="sub">Wybierz kategorię i odkryj nasze sprawdzone, rodzinne przepisy.</p>'
+                f'<div class="nb-tabs" role="tablist">{tabs}</div>'
                 f'<p class="no-results" hidden>Nie znaleziono przepisu. Spróbuj innego słowa.</p>'
-                f'<div class="notebook"><div class="nb-page">{column(left)}</div><div class="spiral" aria-hidden="true"></div><div class="nb-page">{column(right)}</div></div></section>')
+                f'<div class="notebook"><div class="spiral" aria-hidden="true"></div>{panels}</div></section>')
     script = """<script>
-(function(){var q=document.getElementById('q');if(!q)return;
+(function(){
+var root=document.getElementById('zeszyt');if(!root)return;root.classList.add('tabs-on');
+var cats=[].slice.call(root.querySelectorAll('.nb-cat')),tabs=[].slice.call(root.querySelectorAll('.nb-tab')),q=document.getElementById('q');
+function show(id){if(!document.getElementById(id))id=cats[0].id;cats.forEach(function(c){c.classList.toggle('active',c.id===id);});
+tabs.forEach(function(t){var on=t.dataset.target===id;t.classList.toggle('active',on);t.setAttribute('aria-selected',on);});}
 function n(s){return s.toLowerCase().replace(/ł/g,'l').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');}
-function f(){var v=n(q.value.trim()),any=false;document.querySelectorAll('.nb-cat').forEach(function(c){var vis=0;
-c.querySelectorAll('li').forEach(function(li){var ok=!v||li.dataset.name.indexOf(v)>-1;li.hidden=!ok;if(ok)vis++;});
-c.hidden=!vis;if(vis)any=true;});document.querySelector('.no-results').hidden=any;}
-q.addEventListener('input',f);document.getElementById('szukaj').addEventListener('submit',function(){f();document.getElementById('zeszyt').scrollIntoView({behavior:'smooth'});});
+function f(){var v=q?n(q.value.trim()):'',any=false;root.classList.toggle('searching',!!v);
+cats.forEach(function(c){var vis=0;c.querySelectorAll('li').forEach(function(li){var ok=!v||li.dataset.name.indexOf(v)>-1;li.hidden=!ok;if(ok)vis++;});
+c.querySelectorAll('.nb-group').forEach(function(g){g.hidden=!g.querySelector('li:not([hidden])');});
+c.classList.toggle('has-hits',!!(v&&vis));if(vis)any=true;});root.querySelector('.no-results').hidden=any;}
+tabs.forEach(function(t){t.addEventListener('click',function(){if(q){q.value='';f();}show(t.dataset.target);history.replaceState(null,'','#'+t.dataset.target);});});
+function fromHash(){var h=location.hash.slice(1);if(h.indexOf('kat-')===0){show(h);root.scrollIntoView({behavior:'smooth'});}}
+window.addEventListener('hashchange',fromHash);show((location.hash.slice(1).indexOf('kat-')===0)?location.hash.slice(1):cats[0].id);
+if(q){q.addEventListener('input',f);document.getElementById('szukaj').addEventListener('submit',function(){f();root.scrollIntoView({behavior:'smooth'});});}
 })();</script>"""
     body = hero + f'<section class="tiles">{tiles}</section>' + notebook + script
     (output / "index.html").write_text(page("Strona główna", body, top=header(about, "home"), bottom=footer()), encoding="utf-8")

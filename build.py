@@ -137,7 +137,7 @@ def build(output: Path) -> None:
             shutil.copyfile(folder / data["miniatura"], destination / data["miniatura"])
         note_date = data.get("data_notatki")
         formatted_date = f'{date.fromisoformat(str(note_date)):%d.%m.%Y}' if note_date else None
-        groups[str(data["kategoria"])].append((str(data["tytul"]), slug, thumb, formatted_date))
+        groups[str(data["kategoria"])].append((str(data["tytul"]), slug, thumb, formatted_date, str(data.get("podkategoria") or "")))
     render_home(groups, output, ROOT, page)
     (output / ".nojekyll").touch()
 
