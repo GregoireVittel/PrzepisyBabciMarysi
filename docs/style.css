@@ -384,3 +384,8 @@ body.home-page { overflow-x: hidden; }
 @media (min-width: 761px) { .nb-tabs { flex-wrap: nowrap; gap: .3rem; } }
 .nb-title { white-space: nowrap; }
 @media (max-width: 760px) { .nb-cat h3 { flex-wrap: wrap; } .nb-count { flex-basis: 100%; margin-left: 0; padding-left: calc(54px + .7rem); margin-top: -.3rem; } }
+/* równy podział wpisów na obie strony zeszytu */
+.nb-cols { column-fill: balance; }
+.nb-group { break-inside: auto; }
+.nb-sub { break-after: avoid; }
+.nb-cat li { break-inside: avoid; }
