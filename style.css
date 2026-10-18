@@ -260,3 +260,41 @@ body.home-page { overflow-x: hidden; }
   .hero-photo .note { width: 7.2rem; font-size: 1rem; padding: .6rem .7rem; bottom: 36vw; right: .8rem; }
   .hero-photo .note span { font-size: .9rem; }
 }
+/* szerokie ekrany: zdjęcie nie rośnie bez końca */
+.hero.hero-photo {
+  width: min(100vw, 1500px);
+  margin-left: calc(50% - min(50vw, 750px));
+  min-height: clamp(460px, 44vw, 640px);
+  background:
+    linear-gradient(to right, #f5ecd7 0%, #f5ecd7e6 22%, #f5ecd780 40%, #f5ecd700 55%, #f5ecd700 94%, #f5ecd7 100%),
+    linear-gradient(to bottom, #f5ecd7 0%, #f5ecd700 12%, #f5ecd700 82%, #f5ecd7 100%),
+    url("zasoby/tlo.jpg") right bottom / cover no-repeat;
+}
+@media (max-width: 760px) {
+  .hero.hero-photo {
+    width: 100vw; margin-left: calc(50% - 50vw); min-height: 0;
+    background:
+      linear-gradient(to bottom, #f5ecd7 0%, #f5ecd7 52%, #f5ecd700 68%, #f5ecd700 92%, #f5ecd7 100%),
+      url("zasoby/tlo-mobile.jpg") center bottom / 100% auto no-repeat,
+      #f5ecd7;
+  }
+}
+/* zdjęcie wtapia się w papier z każdej strony (bez widocznych krawędzi) */
+.hero.hero-photo { background: none; isolation: isolate; }
+.hero.hero-photo::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: url("zasoby/tlo.jpg") right bottom / cover no-repeat;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #0006 22%, #000 48%, #000 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 14%, #000 82%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0%, #0006 22%, #000 48%, #000 90%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 14%, #000 82%, transparent 100%);
+  mask-composite: intersect;
+}
+@media (max-width: 760px) {
+  .hero.hero-photo { background: none; }
+  .hero.hero-photo::before {
+    top: auto; height: 72vw;
+    background: url("zasoby/tlo-mobile.jpg") center bottom / 100% auto no-repeat;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 88%, transparent 100%);
+  }
+}

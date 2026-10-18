@@ -6,6 +6,7 @@ import argparse
 from collections import defaultdict
 from datetime import date
 from html import escape
+import hashlib
 from pathlib import Path
 import re
 import shutil
@@ -16,6 +17,7 @@ import yaml
 from home import render_home
 
 ROOT = Path(__file__).resolve().parent
+VERSION = hashlib.md5((ROOT / "style.css").read_bytes()).hexdigest()[:8]
 SOURCE = ROOT / "przepisy"
 TRANSCRIPTION = "## Transkrypcja (dokładnie jak na kartce)"
 NOTES = "## Uwagi"
@@ -38,7 +40,7 @@ def page(title: str, body: str, *, recipe: bool = False, top: str | None = None,
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&amp;family=Lora:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap&amp;subset=latin-ext" rel="stylesheet">
-  <link rel="stylesheet" href="{css}">
+  <link rel="stylesheet" href="{css}?v={VERSION}">
 </head>
 <body class="{'recipe-page' if recipe else 'home-page'}">
   {top or f'<header class="site-header"><nav><a href="{home}">Przepisy Babci Marysi</a></nav></header>'}
