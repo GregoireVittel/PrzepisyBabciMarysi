@@ -115,7 +115,7 @@ def build(output: Path) -> None:
         shutil.rmtree(output)
     output.mkdir(parents=True)
     shutil.copyfile(ROOT / "style.css", output / "style.css")
-    groups: dict[str, list[tuple[str, str, str | None, str | None]]] = defaultdict(list)
+    groups: dict[str, list[tuple[str, str, str | None]]] = defaultdict(list)
     for source in sorted(SOURCE.glob("*/przepis.md")):
         data, body = read_recipe(source)
         if data.get("status") != "zweryfikowany":
@@ -127,22 +127,19 @@ def build(output: Path) -> None:
         destination = output / "przepisy" / slug
         destination.mkdir(parents=True)
         render_recipe(data, body, folder, destination)
-        photos = data.get("zdjecia") or []
-        thumb = data.get("miniatura") or (photos[0]["plik"] if photos else None)
         if data.get("miniatura"):
             shutil.copyfile(folder / data["miniatura"], destination / data["miniatura"])
         note_date = data.get("data_notatki")
         formatted_date = f'{date.fromisoformat(str(note_date)):%d.%m.%Y}' if note_date else None
-        groups[str(data["kategoria"])].append((str(data["tytul"]), slug, thumb, formatted_date))
+        groups[str(data["kategoria"])].append((str(data["tytul"]), slug, formatted_date))
     parts = ['<div class="home-intro"><h1>Przepisy Babci Marysi</h1><p>Rodzinne przepisy spisane ręką Babci Marysi</p></div>']
     if not groups:
         parts.append("<p>Brak zweryfikowanych przepisów.</p>")
     for category in sorted(groups, key=str.casefold):
         parts.append(f'<section class="category"><h2>{text(category)}</h2><ul class="recipe-list">')
-        for title, slug, photo, note_date in sorted(groups[category], key=lambda entry: entry[0].casefold()):
-            image = (f'<img src="przepisy/{slug}/{text(photo)}" alt="Fragment oryginalnej notatki: {text(title)}" loading="lazy">' if photo else '')
+        for title, slug, note_date in sorted(groups[category], key=lambda entry: entry[0].casefold()):
             tags = f'<span class="tag date-tag">{text(note_date)}</span>' if note_date else ''
-            parts.append(f'<li class="recipe-card"><a href="przepisy/{slug}/">{image}<span class="card-content"><span class="card-title">{text(title)}</span><span class="tags">{tags}</span></span></a></li>')
+            parts.append(f'<li class="recipe-card"><a href="przepisy/{slug}/"><span class="card-title">{text(title)}</span>{tags}</a></li>')
         parts.append("</ul></section>")
     (output / "index.html").write_text(page("Strona główna", "\n".join(parts)), encoding="utf-8")
     (output / ".nojekyll").touch()

@@ -59,17 +59,16 @@ Body sections:
   oryginalny zapis; awaryjnie cursive) i Lora (tekst; awaryjnie Georgia, serif).
 - Strona główna: tytuł „Przepisy Babci Marysi”, kursywny podtytuł
   „Rodzinne przepisy spisane ręką Babci Marysi”, grupowanie po kategorii
-  z odręcznymi nagłówkami. Karty jak kartki zeszytu: cień, taśma washi z CSS,
-  lekkie naprzemienne pochylenie (od -1,5° do 1,5°) prostowane po najechaniu,
-  góra zdjęcia (`object-fit: cover; object-position: top`), tytuł Caveat,
-  etykiety kategorii i daty notatki, jeśli istnieje.
+  z odręcznymi nagłówkami. Bez zdjęć na stronie głównej: tekstowy spis
+  treści na kartce starego zeszytu, numerowane pozycje z tytułem Caveat
+  i datą notatki, jeśli istnieje. Zdjęcia pozostają na stronach przepisów.
 - Strona przepisu: oryginalne zdjęcie w białej ramce z cieniem, lekkim
   pochyleniem i taśmą w rogach, klikalne do pełnego rozmiaru. Składniki,
   Przygotowanie i Oryginalny zapis na papierze z jasnoniebieskimi liniami
   oraz cienkim czerwonym marginesem; zachowaj dokładnie końce linii zapisu.
   Uwagi na żółtawej samoprzylepnej kartce; data jako drobny kursywny podpis
   „Notatka z dnia DD.MM.RRRR”.
-- Maksymalna szerokość około 900 px. Na telefonie 375 px jedna kolumna kart
+- Maksymalna szerokość około 900 px. Na telefonie 375 px jedna kolumna wpisów
   i brak poziomego przewijania. Wyłącz pochylenia i animacje dla
   `prefers-reduced-motion`; zachowaj czytelny kontrast.
 - Cały interfejs po polsku. Nie zmieniaj treści przepisów ani plików w
