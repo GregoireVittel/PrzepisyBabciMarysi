@@ -128,9 +128,12 @@ def build(output: Path) -> None:
         destination.mkdir(parents=True)
         render_recipe(data, body, folder, destination)
         photos = data.get("zdjecia") or []
+        thumb = data.get("miniatura") or (photos[0]["plik"] if photos else None)
+        if data.get("miniatura"):
+            shutil.copyfile(folder / data["miniatura"], destination / data["miniatura"])
         note_date = data.get("data_notatki")
         formatted_date = f'{date.fromisoformat(str(note_date)):%d.%m.%Y}' if note_date else None
-        groups[str(data["kategoria"])].append((str(data["tytul"]), slug, photos[0]["plik"] if photos else None, formatted_date))
+        groups[str(data["kategoria"])].append((str(data["tytul"]), slug, thumb, formatted_date))
     parts = ['<div class="home-intro"><h1>Przepisy Babci Marysi</h1><p>Rodzinne przepisy spisane ręką Babci Marysi</p></div>']
     if not groups:
         parts.append("<p>Brak zweryfikowanych przepisów.</p>")
@@ -138,9 +141,7 @@ def build(output: Path) -> None:
         parts.append(f'<section class="category"><h2>{text(category)}</h2><ul class="recipe-list">')
         for title, slug, photo, note_date in sorted(groups[category], key=lambda entry: entry[0].casefold()):
             image = (f'<img src="przepisy/{slug}/{text(photo)}" alt="Fragment oryginalnej notatki: {text(title)}" loading="lazy">' if photo else '')
-            tags = f'<span class="tag">{text(category)}</span>'
-            if note_date:
-                tags += f'<span class="tag date-tag">{text(note_date)}</span>'
+            tags = f'<span class="tag date-tag">{text(note_date)}</span>' if note_date else ''
             parts.append(f'<li class="recipe-card"><a href="przepisy/{slug}/">{image}<span class="card-content"><span class="card-title">{text(title)}</span><span class="tags">{tags}</span></span></a></li>')
         parts.append("</ul></section>")
     (output / "index.html").write_text(page("Strona główna", "\n".join(parts)), encoding="utf-8")

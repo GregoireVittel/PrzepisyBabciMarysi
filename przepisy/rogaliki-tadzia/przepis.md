@@ -2,6 +2,7 @@
 tytul: "Rogaliki Tadzia"
 slug: "rogaliki-tadzia"
 kategoria: "Wypieki"
+miniatura: "miniatura.jpg"
 zdjecia:
   - plik: "skan-1.jpg"
     opis: "Kartka z kalendarza, 13 czerwca 2000"
