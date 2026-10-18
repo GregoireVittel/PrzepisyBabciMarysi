@@ -18,7 +18,7 @@ QUOTE = "Dobre jedzenie tworzy najpiękniejsze wspomnienia."
 SIGNATURE = "Babcia Marysia"
 
 COLORS = {"ciasta": "pink", "masy i kremy": "green", "pączki i faworki": "yellow",
-          "serniki": "blue", "torty": "peach", "wypieki": "lilac"}
+          "serniki": "blue", "torty": "peach", "wypieki": "lilac", "przetwory": "green"}
 CYCLE = ["pink", "green", "yellow", "blue", "peach", "lilac"]
 
 S = 'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"'
@@ -28,6 +28,7 @@ ICONS = {
     "pączki i faworki": f'<svg viewBox="0 0 64 64" {S}><ellipse cx="24" cy="38" rx="16" ry="11"/><ellipse cx="42" cy="30" rx="15" ry="10"/><path d="M18 33h2M26 31h2M22 39h2M38 25h2M46 27h2M42 33h2"/></svg>',
     "serniki": f'<svg viewBox="0 0 64 64" {S}><path d="M8 40L50 22l6 4v14z"/><path d="M8 40v8h48v-8"/><path d="M8 44h48"/><circle cx="44" cy="17" r="4"/><path d="M47 13l3-4"/></svg>',
     "torty": f'<svg viewBox="0 0 64 64" {S}><path d="M10 30h44v20H10z"/><path d="M10 40c5 3 9-3 14 0s9 3 14 0 10-3 16 0"/><path d="M16 30v-6h32v6"/><path d="M24 24v-8M32 24v-8M40 24v-8"/><path d="M24 12c-1 1-1 3 0 3 1 0 1-2 0-3zM32 12c-1 1-1 3 0 3 1 0 1-2 0-3zM40 12c-1 1-1 3 0 3 1 0 1-2 0-3z"/></svg>',
+    "przetwory": f'<svg viewBox="0 0 64 64" {S}><path d="M20 14h24v6H20z"/><path d="M22 20c-6 4-8 9-8 16v12c0 4 3 7 7 7h22c4 0 7-3 7-7V36c0-7-2-12-8-16"/><path d="M18 34h28"/><circle cx="27" cy="44" r="4"/><circle cx="38" cy="42" r="4"/><path d="M27 40c0-2 1-3 3-4M38 38c0-2 1-3 3-4"/></svg>',
     "default": f'<svg viewBox="0 0 64 64" {S}><path d="M12 42c4-16 18-26 34-24-8 4-12 10-12 18 0 4 2 8 6 10-10 4-22 2-28-4z"/><path d="M20 38c4-6 9-10 15-12M26 44c3-5 7-8 12-10"/></svg>',
 }
 HEART = '<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.3C1 8.4 3.1 5 6.6 5c2.2 0 3.6 1.2 4.4 2.6.8-1.4 2.2-2.6 4.4-2.6 3.5 0 5.6 3.4 4.2 6.7C19.5 16.4 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2"/></svg>'
