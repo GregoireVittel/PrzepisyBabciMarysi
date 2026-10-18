@@ -351,3 +351,5 @@ body.home-page { overflow-x: hidden; }
 @media (min-width: 761px) { .tiles { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: .8rem; } .tile-name { font-size: 1.6rem; } }
 .tiles .tile:not(.tile-photo) { aspect-ratio: 4 / 5; min-height: 0; border-radius: 16px; }
 .tiles .tile:not(.tile-photo) .tile-icon { width: 55%; }
+/* etykieta liczby przepisów zawsze w jednej linii */
+.tile-badge { white-space: nowrap; left: .45rem; bottom: .45rem; padding: .12rem .5rem; font-size: .6rem; letter-spacing: .06em; }
