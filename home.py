@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from html import escape
 from pathlib import Path
+import shutil
 import unicodedata
 
 import markdown
@@ -88,21 +89,15 @@ def footer() -> str:
 def render_home(groups: dict, output: Path, root: Path, page) -> None:
     about = (root / "o-babci.md").exists()
     cats = sorted(groups, key=str.casefold)
-    # Hero: kolaż prawdziwych kartek
-    picks = []
-    for cat in cats:
-        for title, slug, thumb, _ in sorted(groups[cat], key=lambda e: e[0].casefold()):
-            if thumb and len(picks) < 3 and all(p[1] != slug for p in picks):
-                picks.append((title, slug, thumb))
-                break
-    collage = "".join(f'<a class="pin pin-{i}" href="przepisy/{s}/"><img src="przepisy/{s}/{escape(t)}" alt="Kartka z przepisem: {escape(n)}"></a>'
-                      for i, (n, s, t) in enumerate(picks))
-    hero = (f'<section class="hero"><div class="hero-text"><h1><span class="h1-serif">{escape(HERO_LINE1)}</span>'
+    zasoby = root / "zasoby"
+    if zasoby.is_dir():
+        shutil.copytree(zasoby, output / "zasoby", dirs_exist_ok=True)
+    hero = (f'<section class="hero hero-photo"><div class="hero-inner"><div class="hero-text"><h1><span class="h1-serif">{escape(HERO_LINE1)}</span>'
             f'<span class="h1-script">{escape(HERO_LINE2)} {HEART}</span></h1><p>{escape(HERO_TEXT)}</p>'
             f'<form class="search" id="szukaj" role="search" onsubmit="return false"><svg viewBox="0 0 24 24" {S}><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>'
             f'<input type="search" id="q" placeholder="Znajdź swój ulubiony przepis..." aria-label="Szukaj przepisu" autocomplete="off">'
             f'<button type="submit" id="go">Szukaj</button></form></div>'
-            f'<div class="hero-art">{collage}<p class="note">{escape(NOTE_TEXT)} {HEART} <span>{escape(SIGNATURE)}</span></p></div></section>')
+            f'<p class="note">{escape(NOTE_TEXT)} {HEART} <span>{escape(SIGNATURE)}</span></p></div></section>')
     tiles = "".join(f'<a class="tile tile-{color(c, i)}" href="#{anchor(c)}"><span class="tile-name">{escape(c)}</span>'
                     f'<span class="tile-count">{plural(len(groups[c]))}</span><span class="tile-icon">{icon(c)}</span></a>'
                     for i, c in enumerate(cats))
